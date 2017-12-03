@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="aa_stem.finallogscreen.BasicSetup">
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <TextView
+        android:id="@+id/promptMedName"
+        android:text="@string/write_medname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <EditText
+        android:id="@+id/medicineName"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+    <TextView
+        android:id="@+id/promptDoseAmt"
+        android:text="@string/write_doseamt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <EditText
+        android:id="@+id/dosageAmount"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+    <Button
+        android:id="@+id/Next1"
+        android:text="Next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</LinearLayout>
+</android.support.constraint.ConstraintLayout>
+<!--have user first enter how many meds they have, based on that, create e/linear layout-->
+<!-- test>

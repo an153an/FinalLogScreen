@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">FinalLogScreen</string>
+    <string name="write_medname">Write name of medicine.</string>
+    <string name="write_doseamt">Write # dose amt in mg/ml.</string>
+    <string name="mednum">How many medicines do you take?</string>
+    <integer-array name="medAmtNum">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </integer-array>
+</resources>
+
+<!--add many more-->
