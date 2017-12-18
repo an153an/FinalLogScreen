@@ -10,11 +10,15 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.content.Intent;
 
-public class BasicSetup extends AppCompatActivity {
+public class CreatePhoneNumber extends AppCompatActivity {
     TextView viewpromptMedName;
     EditText inputmedicineName;
     TextView viewpromptDoseAmt;
     EditText inputdosageAmount;
+    TextView viewhomephone;
+    EditText inputhomehome;
+    TextView viewcellphone;
+    EditText inputcellphone;
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -24,22 +28,38 @@ public class BasicSetup extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.basicsetup);
-        viewpromptMedName = (TextView) findViewById(R.id.promptMedName);
-        inputmedicineName = (EditText) findViewById(R.id.medicineName) ;
-        viewpromptDoseAmt = (TextView) findViewById(R.id.promptDoseAmt);
-        inputdosageAmount = (EditText) findViewById(R.id.dosageAmount) ;
-
+        setContentView(R.layout.addphonenumbers);
+        viewhomephone = (TextView) findViewById(R.id.prompthomephone);
+        inputhomehome = (EditText) findViewById(R.id.homephone) ;
+        viewcellphone = (TextView) findViewById(R.id.promptcellphone);
+        inputcellphone = (EditText) findViewById(R.id.cellphone) ;
 
 
         //Create Button
-        Button btnVerifyInput = (Button) findViewById(R.id.btnVerifyInput);
+        Button btnVerifyPhone = (Button) findViewById(R.id.btnVerifyPhone);
+
 
         //button click event
-        btnVerifyInput.setOnClickListener(new View.OnClickListener() {
+        btnVerifyPhone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view){
-                AlertDialog.Builder alertDialog = new AlertDialog.Builder(BasicSetup.this);
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(CreatePhoneNumber.this);
+
+                alertDialog.setTitle("Congratulations!");
+                alertDialog.setMessage("Setup is complete.");
+
+                alertDialog.show();
+
+
+            }
+        });
+
+        Button btnHome = (Button) findViewById(R.id.btnHome);
+        //button click event
+        btnHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view){
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(CreatePhoneNumber.this);
 
                 alertDialog.setTitle("Create Alert");
                 alertDialog.setMessage("Are you sure you want to continue..");
@@ -48,7 +68,7 @@ public class BasicSetup extends AppCompatActivity {
                 alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int which) {
-                        Intent i = new Intent(getApplicationContext(),CreatePhoneNumber.class);
+                        Intent i = new Intent(getApplicationContext(),BasicSetup.class);
                         startActivity(i);
                     }
                 });
@@ -56,6 +76,7 @@ public class BasicSetup extends AppCompatActivity {
                 alertDialog.show();
             }
         });
+
     }
 
     /**
@@ -66,3 +87,6 @@ public class BasicSetup extends AppCompatActivity {
 }
 
 
+// When IntakeCt = IntakeCt + 1 Then...
+//     In a Scroll View, Make A Layout (Linear) with following Text Views:
+//       MedName, DoseAmt, TimeTaken

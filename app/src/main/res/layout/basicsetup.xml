@@ -28,11 +28,11 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
     <Button
-        android:id="@+id/Next1"
-        android:text="Next"
+        android:id="@+id/btnVerifyInput"
+        android:text="Validate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 </LinearLayout>
 </android.support.constraint.ConstraintLayout>
+<!--add time frame enter & conditions, survey did this work? /1-10-->
 <!--have user first enter how many meds they have, based on that, create e/linear layout-->
-<!-- test>
