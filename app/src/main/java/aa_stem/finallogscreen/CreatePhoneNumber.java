@@ -1,24 +1,66 @@
 package aa_stem.finallogscreen;
 
+import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.app.Activity;
+
+import java.util.Calendar;
+import java.util.Date;
+import aa_stem.finallogscreen.AlarmReceiver;
+import android.widget.Toast;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
+import android.view.View.OnClickListener;
+import android.telephony.SmsManager;
+import android.media.MediaPlayer;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import java.util.Map;
+
+
 
 public class CreatePhoneNumber extends AppCompatActivity {
     TextView viewpromptMedName;
     EditText inputmedicineName;
     TextView viewpromptDoseAmt;
     EditText inputdosageAmount;
-    TextView viewhomephone;
+    TextView viewpromptStartDate;
     EditText inputhomehome;
-    TextView viewcellphone;
+    TextView viewpromptStartTime;
     EditText inputcellphone;
+    public String mypreference = "project_contents";
+    public static  final String f_home_phone = "homephone";
+    public static final String f_cell_phone = "cellphone";
+    private static final String TAG = "CreatePhoneNumber";
+    String medicine_name = "";
+    String dose_amt = "";
+    String start_Date = "";
+    String start_Time = "";
+    Context context;
+    SharedPreferences sharedPreferences;
+    Date dateTime;
+    String combineTime;
+    String home_phone;
+    String cell_phone;
+    String phoneNo;
+    String homePhoneNo;
+    private AlarmManager alarmMgr;
+    private PendingIntent alarmIntent;
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -29,32 +71,160 @@ public class CreatePhoneNumber extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.addphonenumbers);
-        viewhomephone = (TextView) findViewById(R.id.prompthomephone);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         inputhomehome = (EditText) findViewById(R.id.homephone) ;
-        viewcellphone = (TextView) findViewById(R.id.promptcellphone);
         inputcellphone = (EditText) findViewById(R.id.cellphone) ;
 
+        //get all values in sharedPreferences
+        Map<String, ?> allEntries = sharedPreferences.getAll();
+        for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
+            Log.d("map values", entry.getKey() + ": " + entry.getValue().toString());
+        }
 
-        //Create Button
-        Button btnVerifyPhone = (Button) findViewById(R.id.btnVerifyPhone);
+        viewpromptMedName = (TextView) findViewById(R.id.medicineName);
+        viewpromptDoseAmt = (TextView) findViewById(R.id.dosageAmount);
+        viewpromptStartDate = (TextView) findViewById(R.id.startDate);
+        viewpromptStartTime = (TextView) findViewById(R.id.startTime);
+
+        Intent intent = getIntent();
+        Bundle extras = intent.getExtras();
+
+            medicine_name = extras.getString("med_name");
+            dose_amt = extras.getString("dose_amt");
+            start_Date = extras.getString("startDate");
+            start_Time = extras.getString("startTime");
 
 
-        //button click event
-        btnVerifyPhone.setOnClickListener(new View.OnClickListener() {
+        viewpromptMedName.setText("Medicine Name: "+ medicine_name);
+        viewpromptDoseAmt.setText("Dosage Amount: "+ dose_amt);
+        viewpromptStartDate.setText("Start Date: "+start_Date);
+        viewpromptStartTime.setText("Start Time: "+start_Time);
+
+
+        Button btnHome = (Button) findViewById(R.id.btnHome);
+        Button btnSchedule = (Button) findViewById(R.id.btnSchedule);
+        ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.SEND_SMS},1);
+
+        btnSchedule.setOnClickListener(new OnClickListener() {
+
             @Override
-            public void onClick(View view){
+            public void onClick(View v) {
+
+                phoneNo = inputcellphone.getText().toString();
+                homePhoneNo = inputhomehome.getText().toString();
+                Log.v("phone:",phoneNo);
+                String sms = "Hello...";
+
+
+                //Validating AlarmService
+
+                String[] fields = start_Time.split(":");
+                String hour = fields[0];
+                String min = fields[1];
+                Log.v("Hour:",hour);
+                Log.v("Minute:",min);
+                combineTime = start_Date + " " + start_Time;
+                Log.v("combineTime",combineTime);
+                try{
+                    dateTime = new SimpleDateFormat("dd-MM-yyyy hh:mm").parse(combineTime.toString());
+                    Log.v("DateTime:",dateTime.toString());
+                }catch (ParseException e){
+                    Log.v("Exception Parsing Time",e.getMessage());
+                }
+
+                Long time = dateTime.getTime();
+                Log.v("TimeAlert: ",time.toString());
+
+
+                /*alarmMgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                Log.v("TimeAlert1: ",time.toString());
+                Intent a_intent = new Intent(context,AlarmReceiver.class);
+                Log.v("TimeAlert2: ",time.toString());
+                alarmIntent = PendingIntent.getBroadcast(context,0,a_intent,0);
+                Log.v("TimeAlert3: ",time.toString());
+
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(time);
+                calendar.set(Calendar.HOUR_OF_DAY,new Integer(hour).intValue());
+                calendar.set(Calendar.MINUTE,new Integer(min).intValue());
+                Log.v("TimeAlert4: ",time.toString());
+                alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP,time,1000*60*1,alarmIntent);
+                */
+
+
+                //End of AlarmService
+
+                try {
+                    SmsManager smsManager = SmsManager.getDefault();
+                    smsManager.sendTextMessage(phoneNo, null, sms, null, null);
+                    Toast.makeText(getApplicationContext(), "SMS Sent!",
+                            Toast.LENGTH_LONG).show();
+
+                    Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+                    final MediaPlayer mediaPlayer = MediaPlayer.create(getApplicationContext(), notification);
+                    mediaPlayer.start();
+
+                    Log.d("Timestamp::::",String.valueOf(mediaPlayer.getTimestamp().getAnchorMediaTimeUs()));
+                    Log.d("Timestamp::::",String.valueOf(mediaPlayer.getTimestamp().getAnchorSytemNanoTime()));
+                    Log.d("Timestamp::::",String.valueOf(mediaPlayer.getTimestamp().getMediaClockRate()));
+
+
+                    //Log.dmediaPlayer.getTimestamp().getAnchorMediaTimeUs());
+
+
+                    Thread th = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try{
+                                Thread.sleep(5000);
+                                if(mediaPlayer.isPlaying()){
+                                    mediaPlayer.stop();
+                                }
+                            }catch (InterruptedException e){
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                    th.start();
+                } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(),
+                            "SMS failed, please try again later!",
+                            Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                }
+
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(CreatePhoneNumber.this);
+                alertDialog.setTitle("SMS Alert");
+                alertDialog.setMessage("Alarm Set. Please continue..");
 
-                alertDialog.setTitle("Congratulations!");
-                alertDialog.setMessage("Setup is complete.");
+                alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
 
-                alertDialog.show();
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                            Intent i = new Intent(getApplicationContext(),SentSMSActivity.class);
+                            i.putExtra("med_name",medicine_name);
+                            i.putExtra("dose_amt",dose_amt);
+                            i.putExtra("startDate",start_Date);
+                            i.putExtra("startTime",start_Time);
+                            i.putExtra("cellphone",phoneNo);
+                            i.putExtra("homephone",homePhoneNo);
+                            startActivity(i);
+                        }
+                    });
+
+                alertDialog.setNegativeButton("NO",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Toast.makeText(getApplicationContext(),"You Clicked NO, Please validate Input and Continue.",Toast.LENGTH_LONG).show();
+                                dialogInterface.cancel();
+                            }
+                        });
+                    alertDialog.show();
 
 
             }
         });
 
-        Button btnHome = (Button) findViewById(R.id.btnHome);
         //button click event
         btnHome.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,6 +246,61 @@ public class CreatePhoneNumber extends AppCompatActivity {
                 alertDialog.show();
             }
         });
+
+
+    }
+
+    public void Save(View view) {
+        home_phone = inputhomehome.getText().toString();
+        cell_phone = inputcellphone.getText().toString();
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(f_home_phone, home_phone);
+        editor.putString(f_cell_phone, cell_phone);
+        editor.commit();
+        Toast.makeText(getApplicationContext(),"Information is now saved.",Toast.LENGTH_LONG).show();
+    }
+
+    public void clear(View view) {
+        inputhomehome = (EditText) findViewById(R.id.homephone);
+        inputcellphone = (EditText) findViewById(R.id.cellphone);
+        inputhomehome.setText("");
+        inputcellphone.setText("");
+
+    }
+
+
+    public void scheduleAlarm(View V)
+    {
+        // time at which alarm will be scheduled here alarm is scheduled at 1 day from current time,
+        // we fetch  the current time in milliseconds and added 1 day time
+        // i.e. 24*60*60*1000= 86,400,000   milliseconds in a day
+
+
+
+        combineTime = start_Date + " " + start_Time;
+        Log.v("combineTime",combineTime);
+        try{
+            dateTime = new SimpleDateFormat("dd-MM-yyyy hh:mm").parse(combineTime.toString());
+            Log.v("DateTime:",dateTime.toString());
+        }catch (ParseException e){
+            Log.v("Exception Parsing Time",e.getMessage());
+        }
+
+        Long time = dateTime.getTime();
+        Log.v("TimeAlert: ",time.toString());
+
+        // create an Intent and set the class which will execute when Alarm triggers, here we have
+        // given AlarmReciever in the Intent, the onRecieve() method of this class will execute when
+        // alarm triggers and
+        //we will write the code to send SMS inside onRecieve() method pf Alarmreciever class
+        Intent intentAlarm = new Intent(this, AlarmReceiver.class);
+
+        // create the object
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+        //set the alarm for particular time
+        alarmManager.set(AlarmManager.RTC_WAKEUP,time, PendingIntent.getBroadcast(this,1,  intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT));
+        Toast.makeText(this, "Alarm is currently scheduled for:", Toast.LENGTH_LONG).show();
 
     }
 

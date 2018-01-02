@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">FinalLogScreen</string>
+    <string name="app_name">Medical Adherence App</string>
     <string name="write_medname">Write name of medicine.</string>
     <string name="write_doseamt">Write # dose amt in mg/ml.</string>
     <string name="mednum">How many medicines do you take?</string>
@@ -14,6 +14,12 @@
         <item>4</item>
         <item>5</item>
     </integer-array>
+    <string name="title_activity_sent_sms">SentSMSActivity</string>
+    <string name="dose_prompt">Pick dosage</string>
+    <string-array name="dose_values">
+        <item>mg</item>
+        <item>ml</item>
+    </string-array>
 </resources>
 
-<!--add many more-->
+    <!--add many more-->
